@@ -17,6 +17,7 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 
 	start_date = getdate(fy_start_end_date[0])
 	end_date = getdate(fy_start_end_date[1])
+	
 
 	if periodicity == "Yearly":
 		period_list = [_dict({"to_date": end_date, "key": fiscal_year, "label": fiscal_year})]
@@ -31,10 +32,10 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 
 		# start with first day, so as to avoid year to_dates like 2-April if ever they occur
 		to_date = get_first_day(start_date)
-
+		
 		for i in xrange(12 / months_to_add):
 			to_date = add_months(to_date, months_to_add)
-
+			#frappe.errprint(["to_dateee",to_date])
 			if to_date == get_first_day(to_date):
 				# if to_date is the first day, get the last day of previous month
 				to_date = add_days(to_date, -1)

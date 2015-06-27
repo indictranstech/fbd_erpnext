@@ -167,14 +167,16 @@ def get_data():
 			"items": [
 				{
 					"type": "report",
-					"name":"General Ledger",
+					"name":"General Ledger Summary",
 					"doctype": "GL Entry",
+					"label":"General Ledger",
 					"is_query_report": True,
 				},
 				{
 					"type": "report",
-					"name": "Trial Balance",
+					"name": "Trial Balance C",
 					"doctype": "GL Entry",
+					"label":"Trial Balance",
 					"is_query_report": True,
 				},
 				{
@@ -210,6 +212,18 @@ def get_data():
 				{
 					"type": "report",
 					"name": "Balance Sheet",
+					"doctype": "GL Entry",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Last Year Analysis",
+					"doctype": "GL Entry",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Budget Analysis",
 					"doctype": "GL Entry",
 					"is_query_report": True
 				},

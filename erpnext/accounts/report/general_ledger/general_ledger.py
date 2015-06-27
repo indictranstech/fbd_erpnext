@@ -73,7 +73,7 @@ def get_gl_entries(filters):
 		order by posting_date, account"""\
 		.format(conditions=get_conditions(filters), group_by_condition=group_by_condition),
 		filters, as_dict=1)
-
+	frappe.errprint(gl_entries)
 	return gl_entries
 
 def get_conditions(filters):
