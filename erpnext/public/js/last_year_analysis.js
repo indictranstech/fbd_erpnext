@@ -1,6 +1,6 @@
-frappe.provide("erpnext.financial_statements");
+frappe.provide("erpnext.last_year_analysis");
 
-erpnext.financial_statements = {
+erpnext.last_year_analysis = {
 	"filters": [
 		{
 			"fieldname":"company",
@@ -18,29 +18,22 @@ erpnext.financial_statements = {
 			"default": frappe.defaults.get_user_default("fiscal_year"),
 			"reqd": 1
 		},
+		
 		{
-			"fieldname": "periodicity",
-			"label": __("Periodicity"),
+			"fieldname":"month",
+			"label": __("Month"),
 			"fieldtype": "Select",
-			"options": "Yearly\nHalf-yearly\nQuarterly\nMonthly",
-			"default": "Yearly",
-			"reqd": 1
+			"options": "Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
+			"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", 
+				"Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
 		}
-		// {
-		// 	"fieldname":"month",
-		// 	"label": __("Month"),
-		// 	"fieldtype": "Select",
-		// 	"options": "Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug\nSep\nOct\nNov\nDec",
-		// 	"default": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", 
-		// 		"Dec"][frappe.datetime.str_to_obj(frappe.datetime.get_today()).getMonth()],
-		// }
 	],
 	"formatter": function(row, cell, value, columnDef, dataContext, default_formatter) {
 		//console.log(default_formatter)
 		if (columnDef.df.fieldname=="account") {
 			value = dataContext.account_name;
 
-			columnDef.df.link_onclick = "erpnext.financial_statements.open_general_ledger(" + JSON.stringify(dataContext) + ")";
+			columnDef.df.link_onclick = "erpnext.last_year_analysis.open_general_ledger(" + JSON.stringify(dataContext) + ")";
 			columnDef.df.is_tree = true;
 		}
 

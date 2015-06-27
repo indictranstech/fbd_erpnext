@@ -11,6 +11,8 @@ def execute(filters=None):
 	period_list = get_period_list(filters.fiscal_year, filters.periodicity, from_beginning=True)
 
 	asset = get_data(filters.company, "Asset", "Debit", period_list)
+	
+	
 	liability = get_data(filters.company, "Liability", "Credit", period_list)
 	equity = get_data(filters.company, "Equity", "Credit", period_list)
 	provisional_profit_loss = get_provisional_profit_loss(asset, liability, equity, period_list)
