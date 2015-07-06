@@ -174,6 +174,13 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"name":"General Ledger",
+					"doctype": "GL Entry",
+					"label":"General Ledger",
+					"is_query_report": True,
+				},
+				{
+					"type": "report",
 					"name": "Trial Balance C",
 					"doctype": "GL Entry",
 					"label":"Trial Balance",
@@ -193,7 +200,19 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"name": "Aged Receivables Details",
+					"doctype": "Sales Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
 					"name": "Accounts Payable",
+					"doctype": "Purchase Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Aged Payables Details",
 					"doctype": "Purchase Invoice",
 					"is_query_report": True
 				},
