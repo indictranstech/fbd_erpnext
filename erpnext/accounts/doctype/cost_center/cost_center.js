@@ -5,6 +5,8 @@ frappe.provide("erpnext.accounts");
 
 cur_frm.list_route = "Accounts Browser/Cost Center";
 
+cur_frm.add_fetch('account','root_type','root_type');
+
 erpnext.accounts.CostCenterController = frappe.ui.form.Controller.extend({
 	onload: function() {
 		this.setup_queries();

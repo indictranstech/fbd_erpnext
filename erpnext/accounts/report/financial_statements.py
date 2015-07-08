@@ -76,6 +76,7 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 	return period_list
 
 def get_data(company, root_type, balance_must_be, period_list, ignore_closing_entries=False):
+	#frappe.errprint(root_type)
 	accounts = get_accounts(company, root_type)
 	if not accounts:
 		return None
