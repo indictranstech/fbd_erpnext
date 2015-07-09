@@ -165,7 +165,6 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 	return opening, total_debit, total_credit, gle_map
 
 def get_balance_row(label, balance):
-	frappe.errprint(label)
 	return {
 		"account": "'" + label + "'",
 		"debit": balance if balance > 0 else 0,
