@@ -73,7 +73,6 @@ def get_gl_entries(filters):
 		order by posting_date, account"""\
 		.format(conditions=get_conditions(filters), group_by_condition=group_by_condition),
 		filters, as_dict=1)
-	#frappe.errprint(gl_entries)
 	return gl_entries
 
 def get_conditions(filters):
@@ -104,22 +103,17 @@ def get_conditions(filters):
 def get_data_with_opening_closing(filters, account_details, gl_entries):
 	data = []
 	gle_map = initialize_gle_map(gl_entries)
-
 	opening, total_debit, total_credit, gle_map = get_accountwise_gle(filters, gl_entries, gle_map)
-	#frappe.errprint(opening)
 	# Opening for filtered account
 	if filters.get("account") or filters.get("party"):
 		data += [get_balance_row(_("Opening"), opening), {}]
-		#frappe.errprint(["data",data])
 	for acc, acc_dict in gle_map.items():
 		if acc_dict.entries:
-			#frappe.errprint(["acc_dict",acc_dict.opening])
 			# Opening for individual ledger, if grouped by account
 			if filters.get("group_by_account"):
 				data.append(get_balance_row(_("Opening"), acc_dict.opening))
 
 			data += acc_dict.entries
-
 			# Totals and closing for individual ledger, if grouped by account
 			if filters.get("group_by_account"):
 				data += [{"account": "'" + _("Totals") + "'", "debit": acc_dict.total_debit,
@@ -171,6 +165,7 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 	return opening, total_debit, total_credit, gle_map
 
 def get_balance_row(label, balance):
+	frappe.errprint(label)
 	return {
 		"account": "'" + label + "'",
 		"debit": balance if balance > 0 else 0,
