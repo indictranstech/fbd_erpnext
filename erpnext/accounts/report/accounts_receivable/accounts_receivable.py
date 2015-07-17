@@ -175,7 +175,6 @@ class ReceivablePayableReport(object):
 				voucher_type, voucher_no, against_voucher_type, against_voucher from `tabGL Entry`
 				where docstatus < 2 and party_type=%s {0} order by posting_date, party"""
 				.format(conditions), values, as_dict=True)
-			frappe.errprint(self.gl_entries)
 
 		return self.gl_entries
 
