@@ -110,15 +110,14 @@ class SellingController(StockController):
 		from frappe.utils import money_in_words
 		company_currency = get_company_currency(self.company)
 
-		disable_rounded_total = cint(frappe.db.get_value("Global Defaults", None,
-			"disable_rounded_total"))
+		disable_rounded_total = cint(frappe.db.get_value("Global Defaults", None, "disable_rounded_total"))
 
 		if self.meta.get_field("base_in_words"):
 			self.base_in_words = money_in_words(disable_rounded_total and
-				self.base_grand_total or self.base_rounded_total, company_currency)
+				abs(self.base_grand_total) or abs(self.base_rounded_total), company_currency)
 		if self.meta.get_field("in_words"):
 			self.in_words = money_in_words(disable_rounded_total and
-				self.grand_total or self.rounded_total, self.currency)
+				abs(self.grand_total) or abs(self.rounded_total), self.currency)
 
 	def calculate_commission(self):
 		if self.meta.get_field("commission_rate"):
@@ -171,14 +170,11 @@ class SellingController(StockController):
 				frappe.throw(_("Row {0}: Qty is mandatory").format(d.idx))
 
 			if self.doctype == "Sales Order":
-				if (frappe.db.get_value("Item", d.item_code, "is_stock_item") == 'Yes' or
-					self.has_sales_bom(d.item_code)) and not d.warehouse:
-						frappe.throw(_("Reserved Warehouse required for stock Item {0} in row {1}").format(d.item_code, d.idx))
 				reserved_warehouse = d.warehouse
 				if flt(d.qty) > flt(d.delivered_qty):
 					reserved_qty_for_main_item = flt(d.qty) - flt(d.delivered_qty)
 
-			elif self.doctype == "Delivery Note" and d.against_sales_order:
+			elif self.doctype == "Delivery Note" and d.against_sales_order and not self.is_return:
 				# if SO qty is 10 and there is tolerance of 20%, then it will allow DN of 12.
 				# But in this case reserved qty should only be reduced by 10 and not 12
 
@@ -191,7 +187,7 @@ class SellingController(StockController):
 				else:
 					reserved_qty_for_main_item = -flt(d.qty)
 
-			if self.has_sales_bom(d.item_code):
+			if self.has_product_bundle(d.item_code):
 				for p in self.get("packed_items"):
 					if p.parent_detail_docname == d.name and p.parent_item == d.item_code:
 						# the packing details table's qty is already multiplied with parent's qty
@@ -214,15 +210,15 @@ class SellingController(StockController):
 					'qty': d.qty,
 					'reserved_qty': reserved_qty_for_main_item,
 					'uom': d.stock_uom,
-                                        'stock_uom': d.stock_uom,
+					'stock_uom': d.stock_uom,
 					'batch_no': cstr(d.get("batch_no")).strip(),
 					'serial_no': cstr(d.get("serial_no")).strip(),
 					'name': d.name
 				}))
 		return il
 
-	def has_sales_bom(self, item_code):
-		return frappe.db.sql("""select name from `tabSales BOM`
+	def has_product_bundle(self, item_code):
+		return frappe.db.sql("""select name from `tabProduct Bundle`
 			where new_item_code=%s and docstatus != 2""", item_code)
 
 	def get_already_delivered_qty(self, dn, so, so_detail):

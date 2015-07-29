@@ -20,10 +20,11 @@ def execute(filters=None):
 		for wh in sorted(iwb_map[item]):
 			for batch in sorted(iwb_map[item][wh]):
 				qty_dict = iwb_map[item][wh][batch]
-				data.append([item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,
-					flt(qty_dict.opening_qty, float_precision), flt(qty_dict.in_qty, float_precision),
-					flt(qty_dict.out_qty, float_precision), flt(qty_dict.bal_qty, float_precision)
-				])
+				if qty_dict.opening_qty or qty_dict.in_qty or qty_dict.out_qty or qty_dict.bal_qty:
+					data.append([item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,
+						flt(qty_dict.opening_qty, float_precision), flt(qty_dict.in_qty, float_precision),
+						flt(qty_dict.out_qty, float_precision), flt(qty_dict.bal_qty, float_precision)
+					])
 
 	return columns, data
 
@@ -54,7 +55,7 @@ def get_stock_ledger_entries(filters):
 	return frappe.db.sql("""select item_code, batch_no, warehouse,
 		posting_date, actual_qty
 		from `tabStock Ledger Entry`
-		where docstatus < 2 %s order by item_code, warehouse""" %
+		where docstatus < 2 and ifnull(batch_no, '') != '' %s order by item_code, warehouse""" %
 		conditions, as_dict=1)
 
 def get_item_warehouse_batch_map(filters, float_precision):

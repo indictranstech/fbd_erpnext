@@ -28,10 +28,7 @@ class Task(Document):
 
 	def validate(self):
 		self.validate_dates()
-
-		if self.status!=self.get_db_value("status") and self.status == "Closed":
-			from frappe.desk.form.assign_to import clear
-			clear(self.doctype, self.name)
+		self.validate_status()
 
 	def validate_dates(self):
 		if self.exp_start_date and self.exp_end_date and getdate(self.exp_start_date) > getdate(self.exp_end_date):
@@ -40,17 +37,19 @@ class Task(Document):
 		if self.act_start_date and self.act_end_date and getdate(self.act_start_date) > getdate(self.act_end_date):
 			frappe.throw(_("'Actual Start Date' can not be greater than 'Actual End Date'"))
 
+	def validate_status(self):
+		if self.status!=self.get_db_value("status") and self.status == "Closed":
+			for d in self.depends_on:
+				if frappe.db.get_value("Task", d.task, "status") != "Closed":
+					frappe.throw(_("Cannot close task as its dependant task {0} is not closed.").format(d.task))
+			
+			from frappe.desk.form.assign_to import clear
+			clear(self.doctype, self.name)
+
 	def on_update(self):
 		self.check_recursion()
 		self.reschedule_dependent_tasks()
-		self.update_percentage()
 		self.update_project()
-
-	def update_percentage(self):
-		"""update percent complete in project"""
-		if self.project and not self.flags.from_project:
-			project = frappe.get_doc("Project", self.project)
-			project.run_method("update_percent_complete")
 
 	def update_total_expense_claim(self):
 		self.total_expense_claim = frappe.db.sql("""select sum(total_sanctioned_amount) from `tabExpense Claim`
@@ -70,10 +69,10 @@ class Task(Document):
 		self.act_end_date= tl.end_date
 
 	def update_project(self):
-		if self.project and frappe.db.exists("Project", self.project):
+		if self.project and not self.flags.from_project:
 			project = frappe.get_doc("Project", self.project)
 			project.flags.dont_sync_tasks = True
-			project.update_costing()
+			project.update_project()
 			project.save()
 
 	def check_recursion(self):
@@ -141,7 +140,7 @@ def get_project(doctype, txt, searchfield, start, page_len, filters):
 				%(mcond)s
 			order by name
 			limit %(start)s, %(page_len)s """ % {'key': searchfield,
-			'txt': "%%%s%%" % txt, 'mcond':get_match_cond(doctype),
+			'txt': "%%%s%%" % frappe.db.escape(txt), 'mcond':get_match_cond(doctype),
 			'start': start, 'page_len': page_len})
 
 

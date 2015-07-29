@@ -125,7 +125,7 @@ class TestSalesOrder(unittest.TestCase):
 		existing_reserved_qty_item1 = get_reserved_qty("_Test Item")
 		existing_reserved_qty_item2 = get_reserved_qty("_Test Item Home Desktop 100")
 		
-		so = make_sales_order(item_code="_Test Sales BOM Item")
+		so = make_sales_order(item_code="_Test Product Bundle Item")
 		
 		self.assertEqual(get_reserved_qty("_Test Item"), existing_reserved_qty_item1 + 50)
 		self.assertEqual(get_reserved_qty("_Test Item Home Desktop 100"), 
@@ -164,12 +164,12 @@ class TestSalesOrder(unittest.TestCase):
 
 	def test_reserved_qty_for_over_delivery_with_packing_list(self):
 		# set over-delivery tolerance
-		frappe.db.set_value('Item', "_Test Sales BOM Item", 'tolerance', 50)
+		frappe.db.set_value('Item', "_Test Product Bundle Item", 'tolerance', 50)
 		
 		existing_reserved_qty_item1 = get_reserved_qty("_Test Item")
 		existing_reserved_qty_item2 = get_reserved_qty("_Test Item Home Desktop 100")
 		
-		so = make_sales_order(item_code="_Test Sales BOM Item")
+		so = make_sales_order(item_code="_Test Product Bundle Item")
 		
 		self.assertEqual(get_reserved_qty("_Test Item"), existing_reserved_qty_item1 + 50)
 		self.assertEqual(get_reserved_qty("_Test Item Home Desktop 100"), 
@@ -192,11 +192,11 @@ class TestSalesOrder(unittest.TestCase):
 		frappe.permissions.add_user_permission("Company", "_Test Company 1", "test2@example.com")
 
 		test_user = frappe.get_doc("User", "test@example.com")
-		test_user.add_roles("Sales User", "Material User")
+		test_user.add_roles("Sales User", "Stock User")
 		test_user.remove_roles("Sales Manager")
 
 		test_user_2 = frappe.get_doc("User", "test2@example.com")
-		test_user_2.add_roles("Sales User", "Material User")
+		test_user_2.add_roles("Sales User", "Stock User")
 		test_user_2.remove_roles("Sales Manager")
 
 		frappe.set_user("test@example.com")
