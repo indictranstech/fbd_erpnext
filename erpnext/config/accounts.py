@@ -229,7 +229,7 @@ def get_data():
 				},
 				{
 					"type": "report",
-					"name": "Aged Payable With Tax Details",
+					"name": "Aged Payables With Tax Details",
 					"doctype": "Sales Invoice",
 					"is_query_report": True
 				},
