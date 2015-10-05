@@ -39,8 +39,8 @@ class SalesOrder(SellingController):
 		for d in self.get('items'):
 			check_list.append(cstr(d.item_code))
 
-			if frappe.db.get_value("Item", d.item_code, "is_stock_item") == 'Yes':
-				if not d.warehouse:
+			if (frappe.db.get_value("Item", d.item_code, "is_stock_item") == 'Yes' or
+				self.has_product_bundle(d.item_code)) and not d.warehouse:
 					frappe.throw(_("Reserved warehouse required for stock item {0}").format(d.item_code))
 
 			# used for production plan
@@ -272,6 +272,10 @@ def make_material_request(source_name, target_doc=None):
 	def postprocess(source, doc):
 		doc.material_request_type = "Purchase"
 
+	so = frappe.get_doc("Sales Order", source_name)
+	
+	item_table = "Packed Item" if so.packed_items else "Sales Order Item"
+	
 	doc = get_mapped_doc("Sales Order", source_name, {
 		"Sales Order": {
 			"doctype": "Material Request",
@@ -279,7 +283,7 @@ def make_material_request(source_name, target_doc=None):
 				"docstatus": ["=", 1]
 			}
 		},
-		"Sales Order Item": {
+		item_table: {
 			"doctype": "Material Request Item",
 			"field_map": {
 				"parent": "sales_order_no",

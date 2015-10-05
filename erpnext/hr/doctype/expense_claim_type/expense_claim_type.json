@@ -18,6 +18,14 @@
    "search_index": 0
   }, 
   {
+   "fieldname": "default_account", 
+   "fieldtype": "Link", 
+   "label": "Default Account", 
+   "options": "Account", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "description", 
    "fieldtype": "Small Text", 
    "label": "Description", 
@@ -29,7 +37,7 @@
  ], 
  "icon": "icon-flag", 
  "idx": 1, 
- "modified": "2015-04-19 06:47:51.860833", 
+ "modified": "2015-07-15 08:57:23.069980", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Expense Claim Type", 

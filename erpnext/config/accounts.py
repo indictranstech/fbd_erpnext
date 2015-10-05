@@ -75,6 +75,11 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
+					"name": "Company",
+					"description": _("Company (not Customer or Supplier) master.")
+				},
+				{
+					"type": "doctype",
 					"name": "Fiscal Year",
 					"description": _("Financial / accounting year.")
 				},
@@ -172,6 +177,13 @@ def get_data():
 					"label":"General Ledger",
 					"is_query_report": True,
 				},
+				# {
+				# 	"type": "report",
+				# 	"name":"General Ledger",
+				# 	"doctype": "GL Entry",
+				# 	"label":"General Ledger",
+				# 	"is_query_report": True,
+				# },
 				{
 					"type": "report",
 					"name": "Trial Balance C",
@@ -193,8 +205,32 @@ def get_data():
 				},
 				{
 					"type": "report",
+					"name": "Aged Receivables Details",
+					"doctype": "Sales Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Aged Receivables With Tax Details",
+					"doctype": "Sales Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
 					"name": "Accounts Payable",
 					"doctype": "Purchase Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Aged Payables Details",
+					"doctype": "Purchase Invoice",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Aged Payables With Tax Details",
+					"doctype": "Sales Invoice",
 					"is_query_report": True
 				},
 				{
@@ -230,6 +266,12 @@ def get_data():
 				{
 					"type": "report",
 					"name": "Profit and Loss Statement",
+					"doctype": "GL Entry",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"name": "Profit And Loss Budget Analysis",
 					"doctype": "GL Entry",
 					"is_query_report": True
 				},

@@ -35,7 +35,6 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 		
 		for i in xrange(12 / months_to_add):
 			to_date = add_months(to_date, months_to_add)
-			#frappe.errprint(["to_dateee",to_date])
 			if to_date == get_first_day(to_date):
 				# if to_date is the first day, get the last day of previous month
 				to_date = add_days(to_date, -1)

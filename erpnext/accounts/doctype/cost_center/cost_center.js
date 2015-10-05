@@ -5,6 +5,8 @@ frappe.provide("erpnext.accounts");
 
 cur_frm.list_route = "Accounts Browser/Cost Center";
 
+cur_frm.add_fetch('account','root_type','root_type');
+
 erpnext.accounts.CostCenterController = frappe.ui.form.Controller.extend({
 	onload: function() {
 		this.setup_queries();
@@ -17,7 +19,7 @@ erpnext.accounts.CostCenterController = frappe.ui.form.Controller.extend({
 				return {
 					filters:[
 						['Account', 'company', '=', me.frm.doc.company],
-						['Account', 'report_type', '=', 'Profit and Loss'],
+						['Account', 'root_type', '=', 'Expense'],
 						['Account', 'is_group', '=', '0'],
 					]
 				}

@@ -9,24 +9,34 @@ from erpnext.setup.utils import get_company_currency, get_exchange_rate
 from erpnext.accounts.utils import get_fiscal_year, validate_fiscal_year
 from erpnext.utilities.transaction_base import TransactionBase
 from erpnext.controllers.recurring_document import convert_to_recurring, validate_recurring_document
+from erpnext.controllers.sales_and_purchase_return import validate_return
+
+class CustomerFrozen(frappe.ValidationError): pass
 
 class AccountsController(TransactionBase):
 	def validate(self):
 		if self.get("_action") and self._action != "update_after_submit":
 			self.set_missing_values(for_validate=True)
 		self.validate_date_with_fiscal_year()
+		
 		if self.meta.get_field("currency"):
 			self.calculate_taxes_and_totals()
-			self.validate_value("base_grand_total", ">=", 0)
+			if not self.meta.get_field("is_return") or not self.is_return:
+				self.validate_value("base_grand_total", ">=", 0)
+			
+			validate_return(self)
 			self.set_total_in_words()
 
-		self.validate_due_date()
+		if self.doctype in ("Sales Invoice", "Purchase Invoice") and not self.is_return:
+			self.validate_due_date()
 
 		if self.meta.get_field("is_recurring"):
 			validate_recurring_document(self)
 
 		if self.meta.get_field("taxes_and_charges"):
 			self.validate_enabled_taxes_and_charges()
+			
+		self.validate_party()
 
 	def on_submit(self):
 		if self.meta.get_field("is_recurring"):
@@ -74,6 +84,9 @@ class AccountsController(TransactionBase):
 	def validate_due_date(self):
 		from erpnext.accounts.party import validate_due_date
 		if self.doctype == "Sales Invoice":
+			if not self.due_date:
+				frappe.throw(_("Due Date is mandatory"))
+			
 			validate_due_date(self.posting_date, self.due_date, "Customer", self.customer, self.company)
 		elif self.doctype == "Purchase Invoice":
 			validate_due_date(self.posting_date, self.due_date, "Supplier", self.supplier, self.company)
@@ -331,6 +344,23 @@ class AccountsController(TransactionBase):
 			self._abbr = frappe.db.get_value("Company", self.company, "abbr")
 
 		return self._abbr
+
+	def validate_party(self):
+		frozen_accounts_modifier = frappe.db.get_value( 'Accounts Settings', None,'frozen_accounts_modifier')
+		if frozen_accounts_modifier in frappe.get_roles():
+			return
+		
+		party_type = None
+		if self.meta.get_field("customer"):
+			party_type = 'Customer'
+
+		elif self.meta.get_field("supplier"):
+			party_type = 'Supplier'
+			
+		if party_type:
+			party = self.get(party_type.lower())
+			if frappe.db.get_value(party_type, party, "is_frozen"):
+				frappe.throw("{0} {1} is frozen".format(party_type, party), CustomerFrozen)
 
 @frappe.whitelist()
 def get_tax_rate(account_head):
