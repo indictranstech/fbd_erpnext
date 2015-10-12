@@ -22,7 +22,8 @@ erpnext.financial_statements = {
 			"fieldname": "periodicity",
 			"label": __("Periodicity"),
 			"fieldtype": "Select",
-			"options": "Yearly\nHalf-yearly\nQuarterly\nMonthly",
+			// "options": "Yearly\nHalf-yearly\nQuarterly\nMonthly",
+			"options": "Yearly\nMonthly",
 			"default": "Yearly",
 			"reqd": 1
 		}
