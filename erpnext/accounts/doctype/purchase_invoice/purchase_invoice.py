@@ -57,6 +57,9 @@ class PurchaseInvoice(BuyingController):
 			"items")
 		self.create_remarks()
 
+	def onload(self):
+		pass
+
 	def create_remarks(self):
 		if not self.remarks:
 			if self.bill_no and self.bill_date:
@@ -236,6 +239,40 @@ class PurchaseInvoice(BuyingController):
 			
 		self.update_project()
 
+		self.set_gst_details()
+
+	def set_gst_details(self):
+		gross = 0.0
+		if self.taxes:
+			for tax in self.get("taxes"):
+				gst_acc = frappe.db.sql("""select gst_type from `tabAccount` where name = '%s' """%(tax.account_head),as_list=1)
+				if gst_acc and gst_acc[0][0]=="-GST Input":
+					gross = gross + tax.base_tax_amount
+					input_rate = tax.rate
+					input_gst_paid = tax.base_tax_amount
+			total_gross = gross + self.total
+			d = frappe.new_doc("GST Details")
+			d.gst_type = '-GST Input'
+			d.form_id = self.name
+			d.supplier_name = self.supplier
+			d.date = self.posting_date
+			d.input_rate = input_rate
+			d.input_purchase_value = self.total
+			d.input_gst_paid = input_gst_paid
+			d.input_gross = total_gross
+			d.insert()
+		else :
+			d = frappe.new_doc("GST Details")
+			d.gst_type = '-GST Input'
+			d.form_id = self.name
+			d.supplier_name = self.supplier
+			d.date = self.posting_date
+			d.input_rate = 0.0
+			d.input_purchase_value = self.total
+			d.input_gst_paid = 0.0
+			d.input_gross = self.total
+			d.insert()
+
 	def make_gl_entries(self):
 		auto_accounting_for_stock = \
 			cint(frappe.defaults.get_global_default("auto_accounting_for_stock"))
@@ -371,7 +408,13 @@ class PurchaseInvoice(BuyingController):
 			self.update_billing_status_for_zero_amount_refdoc("Purchase Order")
 		self.make_gl_entries_on_cancel()
 		self.update_project()
-
+		self.del_cst_details()
+ 
+	def del_cst_details(self):
+		gst = frappe.db.sql("""select name from `tabGST Details` where form_id ='%s' and gst_type='-GST Input'"""%(self.name),as_list=1,debug=1)
+		if gst:
+			frappe.db.sql("""delete from `tabGST Details` where name= '%s' """%(gst[0][0]))
+		
 	def update_project(self):
 		project_list = []
 		for d in self.items:

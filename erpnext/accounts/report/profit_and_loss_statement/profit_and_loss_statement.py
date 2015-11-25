@@ -8,24 +8,18 @@ from frappe.utils import flt
 from erpnext.accounts.report.financial_statements import (get_period_list, get_columns, get_data)
 
 def execute(filters=None):
-	# frappe.errprint(filters)
 	period_list = get_period_list(filters.fiscal_year, filters.periodicity)
 	income = get_data(filters.company, "Income", "Credit", period_list, ignore_closing_entries=True)
-	frappe.errprint("income value")
-	frappe.errprint(income)
 	expense = get_data(filters.company, "Expense", "Debit", period_list, ignore_closing_entries=True)
 	net_profit_loss = get_net_profit_loss(income, expense, period_list)
-	# frappe.errprint(net_profit_loss)
 
 	data = []
 	data.extend(income or [])
-	frappe.errprint(["DATA=",data])
 	data.extend(expense or [])
 	if net_profit_loss:
 		data.append(net_profit_loss)
 
 	columns = get_columns(period_list)
-	# frappe.errprint(data)
 
 	return columns, data
 
@@ -39,6 +33,5 @@ def get_net_profit_loss(income, expense, period_list):
 
 		for period in period_list:
 			net_profit_loss[period.key] = flt(income[-2][period.key] - expense[-2][period.key], 3)
-			# frappe.errprint(income[-2][period.key])
 
 		return net_profit_loss
