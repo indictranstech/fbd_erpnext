@@ -67,9 +67,6 @@ class SalesInvoice(SellingController):
 		self.validate_time_logs_are_submitted()
 		self.validate_multiple_billing("Delivery Note", "dn_detail", "amount", "items")
 
-	def onload(self):
-		pass
-
 	def on_submit(self):
 		super(SalesInvoice, self).on_submit()
 
@@ -100,36 +97,30 @@ class SalesInvoice(SellingController):
 		self.set_gst_details()
 
 	def set_gst_details(self):
-		gross = 0.0
+		gross = output_rate = output_gst_collected = 0.0
+		total_gross = self.total
 		if self.taxes:
 			for tax in self.get("taxes"):
-				gst_acc = frappe.db.sql("""select gst_type from `tabAccount` where name = '%s' """%(tax.account_head),as_list=1)
-				if gst_acc and gst_acc[0][0]=="-GST Output":
+				if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Output":
 					gross = gross + tax.base_tax_amount
 					output_rate = tax.rate
 					output_gst_collected = tax.base_tax_amount
 			total_gross = gross + self.total
-			d = frappe.new_doc("GST Details")
-			d.gst_type = '-GST Output'
-			d.form_id = self.name
-			d.customer_name = self.customer
-			d.date = self.posting_date
-			d.output_rate = output_rate
-			d.output_sales_value = self.total
-			d.output_gst_collected = output_gst_collected
-			d.output_gross = total_gross
-			d.insert()
-		else :
-			d = frappe.new_doc("GST Details")
-			d.gst_type = '-GST Output'
-			d.form_id = self.name
-			d.customer_name = self.customer
-			d.date = self.posting_date
-			d.output_rate = 0.0
-			d.output_sales_value = self.total
-			d.output_gst_collected = 0.0
-			d.output_gross = self.total
-			d.insert()
+			self.create_gst_record(output_rate,output_gst_collected,total_gross)
+		else:
+			self.create_gst_record(output_rate,output_gst_collected,total_gross)
+		
+	def create_gst_record(self,output_rate,output_gst_collected,total_gross):
+		d = frappe.new_doc("GST Details")
+		d.gst_type = '-GST Output'
+		d.form_id = self.name
+		d.customer_name = self.customer
+		d.date = self.posting_date
+		d.output_rate = output_rate
+		d.output_sales_value = self.total
+		d.output_gst_collected = output_gst_collected
+		d.output_gross = total_gross
+		d.insert()
 
 	def before_cancel(self):
 		self.update_time_log_batch(None)
@@ -155,10 +146,10 @@ class SalesInvoice(SellingController):
 		self.del_cst_details()
 
 	def del_cst_details(self):
-		gst = frappe.db.sql("""select name from `tabGST Details` where form_id ='%s' and gst_type='-GST Output'"""%(self.name),as_list=1,debug=1)
+		gst = frappe.db.get_value("GST Details", {"form_id": self.name, "gst_type": '-GST Output'}, "name")
 		if gst:
-			frappe.db.sql("""delete from `tabGST Details` where name= '%s' """%(gst[0][0]))
-		
+			frappe.delete_doc("GST Details", gst)
+				
 	def update_status_updater_args(self):
 		if cint(self.update_stock):
 			self.status_updater.append({

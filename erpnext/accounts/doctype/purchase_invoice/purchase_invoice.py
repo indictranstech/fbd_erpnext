@@ -56,10 +56,7 @@ class PurchaseInvoice(BuyingController):
 		self.validate_multiple_billing("Purchase Receipt", "pr_detail", "amount",
 			"items")
 		self.create_remarks()
-
-	def onload(self):
-		pass
-
+				
 	def create_remarks(self):
 		if not self.remarks:
 			if self.bill_no and self.bill_date:
@@ -242,36 +239,30 @@ class PurchaseInvoice(BuyingController):
 		self.set_gst_details()
 
 	def set_gst_details(self):
-		gross = 0.0
+		gross = input_rate = input_gst_paid = 0.0
+		total_gross = self.total
 		if self.taxes:
 			for tax in self.get("taxes"):
-				gst_acc = frappe.db.sql("""select gst_type from `tabAccount` where name = '%s' """%(tax.account_head),as_list=1)
-				if gst_acc and gst_acc[0][0]=="-GST Input":
+				if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Input":
 					gross = gross + tax.base_tax_amount
 					input_rate = tax.rate
 					input_gst_paid = tax.base_tax_amount
 			total_gross = gross + self.total
-			d = frappe.new_doc("GST Details")
-			d.gst_type = '-GST Input'
-			d.form_id = self.name
-			d.supplier_name = self.supplier
-			d.date = self.posting_date
-			d.input_rate = input_rate
-			d.input_purchase_value = self.total
-			d.input_gst_paid = input_gst_paid
-			d.input_gross = total_gross
-			d.insert()
-		else :
-			d = frappe.new_doc("GST Details")
-			d.gst_type = '-GST Input'
-			d.form_id = self.name
-			d.supplier_name = self.supplier
-			d.date = self.posting_date
-			d.input_rate = 0.0
-			d.input_purchase_value = self.total
-			d.input_gst_paid = 0.0
-			d.input_gross = self.total
-			d.insert()
+			self.create_gst_record(input_rate,input_gst_paid,total_gross)
+		else:
+			self.create_gst_record(input_rate,input_gst_paid,total_gross)
+
+	def create_gst_record(self,input_rate,input_gst_paid,total_gross):
+		d = frappe.new_doc("GST Details")
+		d.gst_type = '-GST Input'
+		d.form_id = self.name
+		d.supplier_name = self.supplier
+		d.date = self.posting_date
+		d.input_rate = input_rate
+		d.input_purchase_value = self.total
+		d.input_gst_paid = input_gst_paid
+		d.input_gross = total_gross
+		d.insert()
 
 	def make_gl_entries(self):
 		auto_accounting_for_stock = \
@@ -411,9 +402,9 @@ class PurchaseInvoice(BuyingController):
 		self.del_cst_details()
  
 	def del_cst_details(self):
-		gst = frappe.db.sql("""select name from `tabGST Details` where form_id ='%s' and gst_type='-GST Input'"""%(self.name),as_list=1,debug=1)
+		gst = frappe.db.get_value("GST Details", {"form_id": self.name, "gst_type": '-GST Input'}, "name")
 		if gst:
-			frappe.db.sql("""delete from `tabGST Details` where name= '%s' """%(gst[0][0]))
+			frappe.delete_doc("GST Details", gst)
 		
 	def update_project(self):
 		project_list = []
