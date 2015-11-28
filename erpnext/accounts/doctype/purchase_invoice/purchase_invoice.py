@@ -248,10 +248,9 @@ class PurchaseInvoice(BuyingController):
 					input_rate = tax.rate
 					input_gst_paid = tax.base_tax_amount
 			total_gross = gross + self.total
-			self.create_gst_record(input_rate,input_gst_paid,total_gross)
-		else:
-			self.create_gst_record(input_rate,input_gst_paid,total_gross)
 
+		self.create_gst_record(input_rate,input_gst_paid,total_gross)
+		
 	def create_gst_record(self,input_rate,input_gst_paid,total_gross):
 		d = frappe.new_doc("GST Details")
 		d.gst_type = '-GST Input'
@@ -262,7 +261,7 @@ class PurchaseInvoice(BuyingController):
 		d.input_purchase_value = self.total
 		d.input_gst_paid = input_gst_paid
 		d.input_gross = total_gross
-		d.insert()
+		d.insert(ignore_permissions=True)
 
 	def make_gl_entries(self):
 		auto_accounting_for_stock = \

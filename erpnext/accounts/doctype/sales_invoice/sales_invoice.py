@@ -106,10 +106,9 @@ class SalesInvoice(SellingController):
 					output_rate = tax.rate
 					output_gst_collected = tax.base_tax_amount
 			total_gross = gross + self.total
-			self.create_gst_record(output_rate,output_gst_collected,total_gross)
-		else:
-			self.create_gst_record(output_rate,output_gst_collected,total_gross)
-		
+
+		self.create_gst_record(output_rate,output_gst_collected,total_gross)
+				
 	def create_gst_record(self,output_rate,output_gst_collected,total_gross):
 		d = frappe.new_doc("GST Details")
 		d.gst_type = '-GST Output'
@@ -120,7 +119,7 @@ class SalesInvoice(SellingController):
 		d.output_sales_value = self.total
 		d.output_gst_collected = output_gst_collected
 		d.output_gross = total_gross
-		d.insert()
+		d.insert(ignore_permissions=True)
 
 	def before_cancel(self):
 		self.update_time_log_batch(None)
