@@ -256,6 +256,7 @@ class PurchaseInvoice(BuyingController):
 		d.gst_type = '-GST Input'
 		d.form_id = self.name
 		d.supplier_name = self.supplier
+		d.supplier_gst_type = self.supplier_gst_type
 		d.date = self.posting_date
 		d.input_rate = input_rate
 		d.input_purchase_value = self.total
