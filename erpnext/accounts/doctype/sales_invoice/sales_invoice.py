@@ -113,8 +113,12 @@ class SalesInvoice(SellingController):
 		d = frappe.new_doc("GST Details")
 		d.gst_type = '-GST Output'
 		d.form_id = self.name
+		d.cs_name = self.customer
 		d.customer_name = self.customer
+		d.cs_gst_type = self.customer_gst_type
+		d.gst_type_abbreviation = self.gst_type_abbreviation
 		d.date = self.posting_date
+		d.rate = output_rate
 		d.output_rate = output_rate
 		d.output_sales_value = self.total
 		d.output_gst_collected = output_gst_collected

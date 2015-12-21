@@ -255,9 +255,12 @@ class PurchaseInvoice(BuyingController):
 		d = frappe.new_doc("GST Details")
 		d.gst_type = '-GST Input'
 		d.form_id = self.name
+		d.cs_name = self.supplier
 		d.supplier_name = self.supplier
-		d.supplier_gst_type = self.supplier_gst_type
+		d.cs_gst_type = self.supplier_gst_type
+		d.gst_type_abbreviation = self.gst_type_abbreviation
 		d.date = self.posting_date
+		d.rate = input_rate
 		d.input_rate = input_rate
 		d.input_purchase_value = self.total
 		d.input_gst_paid = input_gst_paid

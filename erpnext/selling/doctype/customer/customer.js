@@ -1,6 +1,7 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
+cur_frm.add_fetch('customer_gst_type','gst_type_abbreviation','gst_type_abbreviation');
 frappe.ui.form.on("Customer", "refresh", function(frm) {
 	cur_frm.cscript.setup_dashboard(frm.doc);
 

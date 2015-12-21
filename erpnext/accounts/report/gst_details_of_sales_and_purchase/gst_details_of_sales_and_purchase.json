@@ -1,17 +1,17 @@
 {
  "add_total_row": 0, 
  "apply_user_permissions": 0, 
- "creation": "2015-11-24 12:16:18.097442", 
+ "creation": "2015-12-18 11:39:34.838547", 
  "disabled": 0, 
  "docstatus": 0, 
  "doctype": "Report", 
  "is_standard": "Yes", 
- "modified": "2015-12-18 11:38:41.703973", 
+ "modified": "2015-12-18 11:39:34.838547", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
- "name": "GST Purchase Details", 
+ "name": "GST Details of Sales and Purchase", 
  "owner": "Administrator", 
  "ref_doctype": "GST Details", 
- "report_name": "GST Purchase Details", 
+ "report_name": "GST Details of Sales and Purchase ", 
  "report_type": "Script Report"
 }

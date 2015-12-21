@@ -25,22 +25,40 @@ def get_columns():
 def get_result(filters):
 	data = []
 	conditions = get_conditions(filters)
-	total_values = frappe.db.sql("""select sum(ifnull(output_sales_value, 0)), sum(ifnull(input_purchase_value, 0)), 
-		sum(ifnull(output_gst_collected, 0)), sum(ifnull(input_gst_paid, 0)) from `tabGST Details` %s""" %conditions,as_list=1)
-	if total_values:
-		gst_total = total_values[0][2] - total_values[0][3]
+	gst_types = frappe.get_all("GST Types",fields=["name"],order_by="name")
+	
+	for d in gst_types:
+		total_out = frappe.db.sql("""select cs_gst_type,sum(ifnull(output_sales_value,0)) from `tabGST Details` where gst_type ='-GST Output' and cs_gst_type='%s' %s """%(d['name'],conditions),as_list=1)
+		for row in total_out:
+			if row[0]!=None:
+				data.append([row[0],row[1]])
 
-	data = [['Total value of standard-rated supplies',total_values[0][0]], ['Total value of zero-rated supplies',0.0],
-			['Total value of exempt supplies',0.0], ['Total value',total_values[0][0]], 
-			['Total value of taxable purchases',total_values[0][1]], 
-			['Output tax due',total_values[0][2]], ['Input tax and refunds claimed',total_values[0][3]], 
-			['Net GST to be paid to IRAS',gst_total], ['Revenue for the accounting Period',total_values[0][0]]]
-		
+
+	total_out_value = frappe.db.sql("""select sum(ifnull(output_sales_value,0)) from `tabGST Details` where gst_type = '-GST Output' %s """%(conditions),as_list=1)
+	if total_out_value:
+		data.append(['Total value of Sales Output',total_out_value[0][0]])
+
+
+	taxable_purchase = frappe.db.sql("""select sum(ifnull(input_purchase_value,0)) from `tabGST Details` where gst_type = '-GST Input' and input_rate != 0 %s """%(conditions),as_list=1)
+	if taxable_purchase:
+		data.append(['Total value of taxable Purchases',taxable_purchase[0][0]])
+
+
+	total = frappe.db.sql("""select sum(ifnull(output_gst_collected, 0)), sum(ifnull(input_gst_paid, 0)) from `tabGST Details` where rate != 0 %s """ %(conditions),as_list=1)
+	if total:
+		data.append(['Output Tax Due',total[0][0]])
+		data.append(['Less: Input tax and refunds claimed',total[0][1]])
+		data.append(['<b>'+'Equals: Net GST to be paid to/(refunded by) IRAS'+'</b>',total[0][0]-total[0][1]])
+
+	data.append([])
+
+	data.append(['Revenue for the accounting period',total_out_value[0][0]])
+	
 	return data
 
 def get_conditions(filters):
 	conditions = ""
-	if filters.get("from_date"): conditions += " where date between '%s'" %filters["from_date"]
+	if filters.get("from_date"): conditions += "and date between '%s'" %filters["from_date"]
 	if filters.get("to_date"): conditions += " and '%s'" %filters["to_date"]
 
 	return conditions
