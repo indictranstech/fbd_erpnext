@@ -114,7 +114,7 @@ class SalesInvoice(SellingController):
 		self.validate_c_form_on_cancel()
 
 		self.make_gl_entries_on_cancel()
-
+				
 	def update_status_updater_args(self):
 		if cint(self.update_stock):
 			self.status_updater.append({

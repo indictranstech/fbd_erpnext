@@ -101,7 +101,6 @@ def calculate_values(accounts_by_name, gl_entries_by_account, period_list):
 				if entry.posting_date <= period.to_date:
 					d[period.key] = d.get(period.key, 0.0) + flt(entry.debit) - flt(entry.credit)
 
-
 def accumulate_values_into_parents(accounts, accounts_by_name, period_list):
 	"""accumulate children's values in parent accounts"""
 	for d in reversed(accounts):

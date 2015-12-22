@@ -111,6 +111,7 @@ def get_balance_on(account=None, date=None, party_type=None, party=None):
 
 @frappe.whitelist()
 def add_ac(args=None):
+	frappe.errprint(args)
 	if not args:
 		args = frappe.local.form_dict
 		args.pop("cmd")

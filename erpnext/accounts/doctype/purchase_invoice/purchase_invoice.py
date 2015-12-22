@@ -56,7 +56,7 @@ class PurchaseInvoice(BuyingController):
 		self.validate_multiple_billing("Purchase Receipt", "pr_detail", "amount",
 			"items")
 		self.create_remarks()
-
+				
 	def create_remarks(self):
 		if not self.remarks:
 			if self.bill_no and self.bill_date:
@@ -371,7 +371,7 @@ class PurchaseInvoice(BuyingController):
 			self.update_billing_status_for_zero_amount_refdoc("Purchase Order")
 		self.make_gl_entries_on_cancel()
 		self.update_project()
-
+				
 	def update_project(self):
 		project_list = []
 		for d in self.items:

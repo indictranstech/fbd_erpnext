@@ -210,6 +210,10 @@ erpnext.AccountsChart = Class.extend({
 						'Equity', 'Cost of Goods Sold', 'Fixed Asset', 'Expense Account',
 						'Income Account', 'Tax', 'Chargeable', 'Temporary'].join('\n'),
 					description: __("Optional. This setting will be used to filter in various transactions.") },
+				{fieldtype:'Select', fieldname:'account_subtype', label:__('Account Subtype'), 
+					options: ['', 'Income', 'Other Income','Expense','Other Expense','Cost of Sales'].join('\n')},
+				{fieldtype:'Select', fieldname:'gst_type', label:__('GST Type'),
+					options: ['-', '-GST Output', '-GST Input','-GST Control'].join('\n')},			
 				{fieldtype:'Float', fieldname:'tax_rate', label:__('Tax Rate')},
 				{fieldtype:'Link', fieldname:'warehouse', label:__('Warehouse'), options:"Warehouse"}
 			]
@@ -223,8 +227,11 @@ erpnext.AccountsChart = Class.extend({
 				$(fd.account_type.wrapper).toggle(false);
 				$(fd.tax_rate.wrapper).toggle(false);
 				$(fd.warehouse.wrapper).toggle(false);
+				$(fd.account_subtype.wrapper).toggle(false);
+				$(fd.gst_type.wrapper).toggle(false);
 			} else {
 				$(fd.account_type.wrapper).toggle(true);
+				$(fd.gst_type.wrapper).toggle(true);
 				fd.account_type.$input.trigger("change");
 			}
 		});
@@ -233,17 +240,39 @@ erpnext.AccountsChart = Class.extend({
 		$(fd.account_type.input).change(function() {
 			$(fd.tax_rate.wrapper).toggle(fd.account_type.get_value()==='Tax');
 			$(fd.warehouse.wrapper).toggle(fd.account_type.get_value()==='Warehouse');
+
+			if((fd.account_type.get_value()=='Income Account') || (fd.account_type.get_value()=='Expense Account')) {
+				$(fd.account_subtype.wrapper).toggle(true);
+			}
+			else{
+				$(fd.account_subtype.wrapper).toggle(false);
+			}
 		})
 
 		// create
 		d.set_primary_action(__("Create New"), function() {
 			var btn = this;
 			var v = d.get_values();
+			// console.log(v);
 			if(!v) return;
 
 			if(v.account_type==="Warehouse" && !v.warehouse) {
 				msgprint(__("Warehouse is required"));
 				return;
+			}
+
+
+			if(v.account_type=="Income Account") {
+				if(!(v.account_subtype=="Income") && !(v.account_subtype=="Other Income")) {
+					msgprint(__("Subtype should be in Income or Other Income when type is 'Income Account'"));
+					return;
+				}
+			}
+			else if(v.account_type=="Expense Account") {
+				if(!(v.account_subtype=="Expense") && !(v.account_subtype=="Other Expense") && !(v.account_subtype=="Cost of Sales")) {
+					msgprint(__("Subtype should be in Expense,Other Expense or Cost of Sales when type is 'Expense Account'"));
+					return;
+				}
 			}
 
 			var node = me.tree.get_selected_node();
