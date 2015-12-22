@@ -1,7 +1,6 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
-cur_frm.add_fetch('supplier_gst_type','gst_type_abbreviation','gst_type_abbreviation');
 cur_frm.cscript.refresh = function(doc, dt, dn) {
 	cur_frm.cscript.make_dashboard(doc);
 

@@ -6,9 +6,6 @@ cur_frm.pformat.print_heading = 'Invoice';
 
 {% include 'selling/sales_common.js' %};
 
-cur_frm.add_fetch('customer','customer_gst_type','customer_gst_type');
-cur_frm.add_fetch('customer','gst_type_abbreviation','gst_type_abbreviation');
-
 frappe.provide("erpnext.accounts");
 erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.extend({
 	onload: function() {

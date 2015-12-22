@@ -94,37 +94,6 @@ class SalesInvoice(SellingController):
 
 		self.update_time_log_batch(self.name)
 
-		self.set_gst_details()
-
-	def set_gst_details(self):
-		gross = output_rate = output_gst_collected = 0.0
-		total_gross = self.total
-		if self.taxes:
-			for tax in self.get("taxes"):
-				if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Output":
-					gross = gross + tax.base_tax_amount
-					output_rate = tax.rate
-					output_gst_collected = tax.base_tax_amount
-			total_gross = gross + self.total
-
-		self.create_gst_record(output_rate,output_gst_collected,total_gross)
-				
-	def create_gst_record(self,output_rate,output_gst_collected,total_gross):
-		d = frappe.new_doc("GST Details")
-		d.gst_type = '-GST Output'
-		d.form_id = self.name
-		d.cs_name = self.customer
-		d.customer_name = self.customer
-		d.cs_gst_type = self.customer_gst_type
-		d.gst_type_abbreviation = self.gst_type_abbreviation
-		d.date = self.posting_date
-		d.rate = output_rate
-		d.output_rate = output_rate
-		d.output_sales_value = self.total
-		d.output_gst_collected = output_gst_collected
-		d.output_gross = total_gross
-		d.insert(ignore_permissions=True)
-
 	def before_cancel(self):
 		self.update_time_log_batch(None)
 
@@ -145,13 +114,6 @@ class SalesInvoice(SellingController):
 		self.validate_c_form_on_cancel()
 
 		self.make_gl_entries_on_cancel()
-
-		self.del_cst_details()
-
-	def del_cst_details(self):
-		gst = frappe.db.get_value("GST Details", {"form_id": self.name, "gst_type": '-GST Output'}, "name")
-		if gst:
-			frappe.delete_doc("GST Details", gst)
 				
 	def update_status_updater_args(self):
 		if cint(self.update_stock):

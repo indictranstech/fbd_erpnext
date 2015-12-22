@@ -236,37 +236,6 @@ class PurchaseInvoice(BuyingController):
 			
 		self.update_project()
 
-		self.set_gst_details()
-
-	def set_gst_details(self):
-		gross = input_rate = input_gst_paid = 0.0
-		total_gross = self.total
-		if self.taxes:
-			for tax in self.get("taxes"):
-				if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Input":
-					gross = gross + tax.base_tax_amount
-					input_rate = tax.rate
-					input_gst_paid = tax.base_tax_amount
-			total_gross = gross + self.total
-
-		self.create_gst_record(input_rate,input_gst_paid,total_gross)
-		
-	def create_gst_record(self,input_rate,input_gst_paid,total_gross):
-		d = frappe.new_doc("GST Details")
-		d.gst_type = '-GST Input'
-		d.form_id = self.name
-		d.cs_name = self.supplier
-		d.supplier_name = self.supplier
-		d.cs_gst_type = self.supplier_gst_type
-		d.gst_type_abbreviation = self.gst_type_abbreviation
-		d.date = self.posting_date
-		d.rate = input_rate
-		d.input_rate = input_rate
-		d.input_purchase_value = self.total
-		d.input_gst_paid = input_gst_paid
-		d.input_gross = total_gross
-		d.insert(ignore_permissions=True)
-
 	def make_gl_entries(self):
 		auto_accounting_for_stock = \
 			cint(frappe.defaults.get_global_default("auto_accounting_for_stock"))
@@ -402,13 +371,7 @@ class PurchaseInvoice(BuyingController):
 			self.update_billing_status_for_zero_amount_refdoc("Purchase Order")
 		self.make_gl_entries_on_cancel()
 		self.update_project()
-		self.del_cst_details()
- 
-	def del_cst_details(self):
-		gst = frappe.db.get_value("GST Details", {"form_id": self.name, "gst_type": '-GST Input'}, "name")
-		if gst:
-			frappe.delete_doc("GST Details", gst)
-		
+				
 	def update_project(self):
 		project_list = []
 		for d in self.items:

@@ -4,9 +4,6 @@
 frappe.provide("erpnext.accounts");
 {% include 'buying/doctype/purchase_common/purchase_common.js' %};
 
-cur_frm.add_fetch('supplier','supplier_gst_type','supplier_gst_type');
-cur_frm.add_fetch('supplier','gst_type_abbreviation','gst_type_abbreviation');
-
 erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 	onload: function() {
 		this._super();
