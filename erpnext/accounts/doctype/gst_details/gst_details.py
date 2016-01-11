@@ -17,8 +17,8 @@ def set_gst_details(doc,method):
 		for tax in doc.get("taxes"):
 			if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Output":
 				gross = gross + tax.base_tax_amount
-				output_rate = tax.rate
-				output_gst_collected = tax.base_tax_amount
+				output_rate = output_rate + tax.rate
+				output_gst_collected = output_gst_collected + tax.base_tax_amount
 		total_gross = gross + doc.total
 
 	create_gst_record(doc,method,output_rate,output_gst_collected,total_gross)
@@ -47,8 +47,8 @@ def set_gst_details_of_pi(doc,method):
 		for tax in doc.get("taxes"):
 			if frappe.db.get_value("Account", tax.account_head, "gst_type")=="-GST Input":
 				gross = gross + tax.base_tax_amount
-				input_rate = tax.rate
-				input_gst_paid = tax.base_tax_amount
+				input_rate = input_rate + tax.rate
+				input_gst_paid = input_gst_paid + tax.base_tax_amount
 		total_gross = gross + doc.total
 
 	create_gst_record_of_pi(doc,method,input_rate,input_gst_paid,total_gross)

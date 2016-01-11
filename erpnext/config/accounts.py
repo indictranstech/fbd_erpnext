@@ -33,6 +33,11 @@ def get_data():
 					"description": _("Supplier database.")
 				},
 				{
+					"type": "doctype",
+					"name": "GST Types",
+					"description": _("GST Types database.")
+				},
+				{
 					"type": "page",
 					"name": "Accounts Browser",
 					"icon": "icon-sitemap",
