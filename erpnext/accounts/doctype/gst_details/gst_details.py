@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe import msgprint, _
 
 class GSTDetails(Document):
 	pass
@@ -77,3 +78,12 @@ def del_cst_details_record(doc,method):
 		gst = frappe.db.get_value("GST Details", {"form_id": doc.name, "gst_type": '-GST Input'}, "name")
 	if gst:
 		frappe.delete_doc("GST Details", gst)
+
+
+def validate_cust_gst_type(doc,method):
+	if frappe.db.get_all("Company") and not doc.customer_gst_type:
+		frappe.throw(_("Please select Customer GST Type First..!"))
+
+def validate_supp_gst_type(doc,method):
+	if frappe.db.get_all("Company") and not doc.supplier_gst_type:
+		frappe.throw(_("Please select Supplier GST Type First..!"))
