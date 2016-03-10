@@ -81,9 +81,11 @@ def del_cst_details_record(doc,method):
 
 
 def validate_cust_gst_type(doc,method):
+	# pass
 	if frappe.db.get_value("Global Defaults", None, "default_company") and not doc.customer_gst_type:
 		frappe.throw(_("Please select Customer GST Type First..!"))
 
 def validate_supp_gst_type(doc,method):
+	# pass
 	if frappe.db.get_value("Global Defaults", None, "default_company") and not doc.supplier_gst_type:
 		frappe.throw(_("Please select Supplier GST Type First..!"))
