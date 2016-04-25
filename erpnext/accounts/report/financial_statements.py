@@ -74,14 +74,15 @@ def get_period_list(fiscal_year, periodicity, from_beginning=False):
 
 	return period_list
 
-def get_data(company, root_type, balance_must_be, period_list, ignore_closing_entries=False):
+def get_data(company, root_type, balance_must_be, period_list, cost_center, ignore_closing_entries=False):
 	accounts = get_accounts(company, root_type)
+	
 	if not accounts:
 		return None
 
 	accounts, accounts_by_name = filter_accounts(accounts)
 	gl_entries_by_account = get_gl_entries(company, period_list[0]["from_date"], period_list[-1]["to_date"],
-		accounts[0].lft, accounts[0].rgt, ignore_closing_entries=ignore_closing_entries)
+		accounts[0].lft, accounts[0].rgt, cost_center, ignore_closing_entries=ignore_closing_entries)
 
 	calculate_values(accounts_by_name, gl_entries_by_account, period_list)
 	accumulate_values_into_parents(accounts, accounts_by_name, period_list)
@@ -199,9 +200,12 @@ def sort_root_accounts(roots):
 
 	roots.sort(compare_roots)
 
-def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closing_entries=False):
+def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, cost_center, ignore_closing_entries=False):
 	"""Returns a dict like { "account": [gl entries], ... }"""
 	additional_conditions = []
+
+	if cost_center:
+		additional_conditions.append("and cost_center = %(cost_center)s")
 
 	if ignore_closing_entries:
 		additional_conditions.append("and ifnull(voucher_type, '')!='Period Closing Voucher'")
@@ -221,7 +225,8 @@ def get_gl_entries(company, from_date, to_date, root_lft, root_rgt, ignore_closi
 			"from_date": from_date,
 			"to_date": to_date,
 			"lft": root_lft,
-			"rgt": root_rgt
+			"rgt": root_rgt,
+			"cost_center":cost_center
 		},
 		as_dict=True)
 

@@ -26,7 +26,14 @@ erpnext.financial_statements = {
 			"options": "Yearly\nMonthly",
 			"default": "Yearly",
 			"reqd": 1
-		}
+		},
+		{
+			"fieldname":"cost_center",
+			"label": __("Job No"),
+			"fieldtype": "Link",
+			"options": "Cost Center",
+			"reqd": 0
+		},
 		// {
 		// 	"fieldname":"month",
 		// 	"label": __("Month"),
@@ -37,7 +44,6 @@ erpnext.financial_statements = {
 		// }
 	],
 	"formatter": function(row, cell, value, columnDef, dataContext, default_formatter) {
-		//console.log(default_formatter)
 		if (columnDef.df.fieldname=="account") {
 			value = dataContext.account_name;
 
