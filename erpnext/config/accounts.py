@@ -34,8 +34,8 @@ def get_data():
 				},
 				{
 					"type": "doctype",
-					"name": "GST Types",
-					"description": _("GST Types database.")
+					"name": "GST Tax Code",
+					"description": _("GST Tax Code database.")
 				},
 				{
 					"type": "page",
