@@ -648,6 +648,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 		$.each(this.frm.doc["taxes"] || [], function(i, tax) {
 			var tax_amount_precision = precision("tax_amount", tax);
 			var tax_rate_precision = precision("rate", tax);
+			var tax_code = ("tax_code", tax)
 			$.each(JSON.parse(tax.item_wise_tax_detail || '{}'),
 				function(item_code, tax_data) {
 					if(!item_tax[item_code]) item_tax[item_code] = {};
@@ -660,6 +661,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 						}
 						var tax_amount = format_currency(flt(tax_data[1], tax_amount_precision), company_currency,
 							tax_amount_precision);
+						tax_amount = tax_amount + " " + "(Code : " + tax.tax_code + ")"
 
 						item_tax[item_code][tax.name] = [tax_rate, tax_amount];
 					} else {
