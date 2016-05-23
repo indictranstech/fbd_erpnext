@@ -212,8 +212,8 @@ erpnext.AccountsChart = Class.extend({
 					description: __("Optional. This setting will be used to filter in various transactions.") },
 				{fieldtype:'Select', fieldname:'account_subtype', label:__('Account Subtype'), 
 					options: ['', 'Income', 'Other Income','Expense','Other Expense','Cost of Sales'].join('\n')},
-				// {fieldtype:'Select', fieldname:'gst_type', label:__('GST Type'),
-				// 	options: ['-', '-GST Output', '-GST Input','-GST Control'].join('\n')},			
+				{fieldtype:'Select', fieldname:'gst_type', label:__('GST Type'),
+					options: ['-', '-GST Output', '-GST Input','-GST Control'].join('\n')},			
 				{fieldtype:'Float', fieldname:'tax_rate', label:__('Tax Rate')},
 				{fieldtype:'Link', fieldname:'warehouse', label:__('Warehouse'), options:"Warehouse"}
 			]
@@ -228,10 +228,10 @@ erpnext.AccountsChart = Class.extend({
 				$(fd.tax_rate.wrapper).toggle(false);
 				$(fd.warehouse.wrapper).toggle(false);
 				$(fd.account_subtype.wrapper).toggle(false);
-				// $(fd.gst_type.wrapper).toggle(false);
+				$(fd.gst_type.wrapper).toggle(false);
 			} else {
 				$(fd.account_type.wrapper).toggle(true);
-				// $(fd.gst_type.wrapper).toggle(true);
+				$(fd.gst_type.wrapper).toggle(true);
 				fd.account_type.$input.trigger("change");
 			}
 		});
