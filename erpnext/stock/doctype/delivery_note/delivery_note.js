@@ -2,6 +2,7 @@
 // License: GNU General Public License v3. See license.txt
 
 {% include 'selling/sales_common.js' %};
+{% include 'account_reports/custom_js.js' %};
 
 frappe.provide("erpnext.stock");
 frappe.provide("erpnext.stock.delivery_note");

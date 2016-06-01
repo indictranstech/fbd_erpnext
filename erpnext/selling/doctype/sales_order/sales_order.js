@@ -2,6 +2,7 @@
 // License: GNU General Public License v3. See license.txt
 
 {% include 'selling/sales_common.js' %}
+{% include 'account_reports/custom_js.js' %};
 
 erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend({
 	refresh: function(doc, dt, dn) {
