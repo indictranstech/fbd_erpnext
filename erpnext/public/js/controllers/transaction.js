@@ -649,8 +649,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 			var tax_amount_precision = precision("tax_amount", tax);
 			var tax_rate_precision = precision("rate", tax);
 			var tax_code = ("tax_code", tax)
-			$.each(JSON.parse(tax.item_wise_tax_detail || '{}'),
-				function(item_code, tax_data) {
+			$.each(JSON.parse(tax.item_wise_tax_detail || '{}'),function(item_code, tax_data) {				
 					if(!item_tax[item_code]) item_tax[item_code] = {};
 					if($.isArray(tax_data)) {
 						var tax_rate = "";
@@ -695,6 +694,30 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 				}).join("\n")
 			});
 		}).join("\n");
+
+		if(!rows) return "";
+		return '<p><a href="#" onclick="$(\'.tax-break-up\').toggleClass(\'hide\'); return false;">Show / Hide tax break-up</a><br><br></p>\
+		<div class="tax-break-up hide" style="overflow-x: auto;"><table class="table table-bordered table-hover">\
+			<thead><tr>' + headings + '</tr></thead> \
+			<tbody>' + rows + '</tbody> \
+		</table></div>';
+	},
+
+	get_item_wise_taxes_html1: function(){
+		var rows = {}
+		var headings = ""
+		// rows = ""
+		var distinct_item_names = [];
+		var distinct_items = [];
+		$.each(this.frm.doc["items"] || [], function(i, item) {
+			console.log(item)
+			console.log(item['item_code'])
+			console.log(item['item_tax_rate'])
+			// if(distinct_item_names.indexOf(item.item_code || item.item_name)===-1) {
+			// 	distinct_item_names.push(item.item_code || item.item_name);
+			// 	distinct_items.push(item);
+			// }
+		});
 
 		if(!rows) return "";
 		return '<p><a href="#" onclick="$(\'.tax-break-up\').toggleClass(\'hide\'); return false;">Show / Hide tax break-up</a><br><br></p>\
@@ -757,6 +780,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 	show_item_wise_taxes: function() {
 		if(this.frm.fields_dict.other_charges_calculation) {
+			// var html = this.get_item_wise_taxes_html1();
 			var html = this.get_item_wise_taxes_html();
 			if (html) {
 				this.frm.toggle_display("other_charges_calculation", true);

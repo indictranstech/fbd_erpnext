@@ -3,6 +3,7 @@
 
 frappe.provide("erpnext.accounts");
 {% include 'buying/doctype/purchase_common/purchase_common.js' %};
+{% include 'account_reports/custom_js.js' %};
 
 erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 	onload: function() {
