@@ -34,6 +34,7 @@ def create_gst_record(doc,method,output_rate,output_gst_collected,tax_code,tax_d
 	d.date = doc.posting_date
 	d.rate = output_rate
 	d.output_rate = output_rate
+	d.output_sales_value = doc.total
 	d.output_gst_collected = output_gst_collected
 	d.save(ignore_permissions=True)
 
@@ -60,6 +61,7 @@ def create_gst_record_of_pi(doc,method,input_rate,input_gst_paid,tax_code,tax_de
 	d.date = doc.posting_date
 	d.rate = input_rate
 	d.input_rate = input_rate
+	d.input_purchase_value = doc.total
 	d.input_gst_paid = input_gst_paid
 	d.save(ignore_permissions=True)
 
